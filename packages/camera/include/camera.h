@@ -6,8 +6,12 @@
 #include <vector>
 #include <map>
 #include <thread>
+#include <cstdint>
 
 #include <boost/lockfree/queue.hpp>
+#include "mcap/writer.hpp"
+
+
 
 using namespace std::chrono_literals;
 
