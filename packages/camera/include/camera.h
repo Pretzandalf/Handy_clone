@@ -22,7 +22,7 @@ class CameraRecorder;
 class MappedFileManager final : public mcap::IWritable {
   public:
     MappedFileManager() = default;
-    ~MappedFileManager() override;
+    ~MappedFileManager() override{};
 
     void init(
         CameraRecorder* recorder_instance, std::string filepath, size_t bytes_per_second_estim);

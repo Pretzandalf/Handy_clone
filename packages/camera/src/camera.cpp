@@ -74,15 +74,11 @@ void MappedFileManager::init(
         exit(EXIT_FAILURE);
     }
 
-    mmaped_ptr_ = mmap(nullptr, kMmapLargeConstant, PROT_WRITE, MAP_PRIVATE, file_, 0);
+    mmaped_ptr_ = mmap(nullptr, kMmapLargeConstant, PROT_WRITE, MAP_SHARED, file_, 0);
     if (mmaped_ptr_ == MAP_FAILED) {
         perror("mmap");
         exit(EXIT_FAILURE);
     }
-}
-MappedFileManager::~MappedFileManager() {
-    printf("TOO EARLY\n");
-    close(file_);
 }
 
 void MappedFileManager::write(const std::byte* data, uint64_t size) { handleWrite(data, size); }
@@ -126,6 +122,7 @@ void MappedFileManager::end() {
         exit(EXIT_FAILURE);
     }
     printf("MappedFileManager ended and shrinked file to %ld\n", alligned_fact_size);
+    close(file_);
 }
 uint64_t MappedFileManager::size() const { return size_; }
 
@@ -138,18 +135,13 @@ CameraRecorder::CameraRecorder(
     if (save_to_file) {
         // if needed register saveCallbackLauncher as a callback when images are syncronized
         mcap::McapWriterOptions options("");
-        options.compression = mcap::Compression::Lz4;
-        options.compressionLevel = mcap::CompressionLevel::Fastest;
-        options.chunkSize = 1920 * 1200;
         options.noChunking = true;
 
-        options.noChunkCRC = true;
         options.noMessageIndex = true;
         options.noSummary = true;
         options.noAttachmentCRC = true;
         options.noAttachmentIndex = true;
         options.noMetadataIndex = true;
-        options.noChunkIndex = true;
         options.noStatistics = true;
 
         std::string filename_str(output_filename);
