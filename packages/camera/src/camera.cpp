@@ -121,7 +121,11 @@ void MappedFileManager::end() {
         perror("Error un-mmapping the file");
         exit(EXIT_FAILURE);
     }
-    printf("MappedFileManager ended and shrinked file to %ld\n", alligned_fact_size);
+    if (ftruncate(file_, size_) == -1) {
+        perror("error resizing the file");
+        exit(EXIT_FAILURE);
+    }
+    printf("MappedFileManager ended and shrinked file to %ld\n", size_);
     close(file_);
 }
 uint64_t MappedFileManager::size() const { return size_; }
@@ -138,7 +142,6 @@ CameraRecorder::CameraRecorder(
         options.noChunking = true;
 
         options.noMessageIndex = true;
-        options.noSummary = true;
         options.noAttachmentCRC = true;
         options.noAttachmentIndex = true;
         options.noMetadataIndex = true;
@@ -147,10 +150,6 @@ CameraRecorder::CameraRecorder(
         std::string filename_str(output_filename);
         file_manager_.init(this, filename_str, 1920 * 1200 * 100);
         mcap_writer_.open(file_manager_, options);
-        // if (!status.ok()) {
-        //     printf("%d %s\n", status.code, status.message.c_str());
-        //     exit(EXIT_FAILURE);
-        // }
     }
 
     abortIfNot("camera init", CameraSdkInit(0));
